@@ -156,7 +156,27 @@ proc interpret
     mov cx, [bp+8]
 
 interpreter_loop:
+    xor ax, ax
+    mov al, [byte ptr bx+si]
+    cmp al, '+'
+    je command_inc
+    cmp al, '-'
+    je command_dec
+    jmp end_iteration
 
+command_inc:
+    mov ah, [byte ptr es:di]
+    inc ah
+    mov [byte ptr es:di], ah
+jmp end_iteration
+
+command_dec:
+    mov ah, [byte ptr es:di]
+    dec ah
+    mov [byte ptr es:di], ah
+jmp end_iteration
+
+end_iteration:
     inc si
 loop interpreter_loop
 
