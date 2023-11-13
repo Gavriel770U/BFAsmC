@@ -20,13 +20,18 @@ proc open_file
     ; [bp+8] offset error_message
 
     push bp
+    mov bp, sp
     push ax
     push bx
     push dx
 
+    xor ax, ax
+    xor bx, bx
+    xor dx, dx
+
     mov ah, 3Dh
     xor al, al ; set read-only mode
-    mov dx, [file_name]
+    mov dx, [bp+4]
     int 21h
     jc open_error
     mov bx, [bp+6]
@@ -65,4 +70,4 @@ main:
 exit:
     mov ax, 4c00h
     int 21h
-END main    
+END main
