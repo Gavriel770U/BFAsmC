@@ -6,10 +6,10 @@ DATASEG
     MEMORY_SIZE equ 100
     INITIAL_MEMORY_VALUE equ 0
 
-    COMMANDS_SIZE equ 2000
+    COMMANDS_SIZE equ 50
     INITIAL_COMMAND_SIZE equ 0
 
-    file_name db 'code.bf', 0
+    file_name db 'code.txt', 0
     file_handle dw ?
     error_message db 'Error', 10, 13, '$'
 
@@ -141,6 +141,10 @@ main:
     push offset commands
     push offset file_handle
     call read_file
+
+    mov dx, offset commands
+    mov ah, 9h
+    int 21h
 
     push offset file_handle
     call close_file
