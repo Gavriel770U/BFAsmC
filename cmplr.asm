@@ -14,6 +14,7 @@ DATASEG
 
 CODESEG
 
+;----------------------------------------------------------------
 proc open_file
     ; [bp+4] offset file_name
     ; [bp+6] offset file_handle
@@ -54,6 +55,31 @@ open_error:
     pop bp
     ret 6
 endp open_file
+;----------------------------------------------------------------
+
+;----------------------------------------------------------------
+proc close_file
+    ; [bp+4] offset file_handle
+
+    push bp
+    mov bp, sp
+    push ax
+    push bx
+
+    xor ax, ax
+    xor bx, bx
+
+    mov ah, 3Eh
+    mov bx, [bp+4]
+    mov bx, [bx]
+    int 21h
+
+    pop bx
+    pop ax
+    pop bp
+    ret 2
+endp close_file
+;----------------------------------------------------------------
 
 main:
     mov ax, @data
@@ -64,6 +90,9 @@ main:
     push offset file_handle
     push offset file_name
     call open_file
+
+    push offset file_handle
+    call close_file
 
     jmp exit
 
