@@ -142,6 +142,13 @@ main:
     push offset file_handle
     call read_file
 
+    ; set endline character at 
+    ; the end of the commands buffer 
+    mov bx, [commands_length]
+    mov si, offset commands
+    mov al, '$'
+    mov [byte ptr si+bx], al
+
     mov dx, offset commands
     mov ah, 9h
     int 21h
