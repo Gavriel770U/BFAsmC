@@ -6,7 +6,7 @@ DATASEG
     MEMORY_SIZE equ 100
     INITIAL_MEMORY_VALUE equ 0
 
-    COMMANDS_SIZE equ 50
+    COMMANDS_SIZE equ 100
     INITIAL_COMMAND_SIZE equ 0
 
     file_name db 'code.txt', 0
@@ -141,18 +141,19 @@ proc interpret
     push ax
     push bx
     push cx
+    push dx
     push si
     push di
-    push es
 
     xor ax, ax
     xor bx, bx
     xor cx, cx
+    xor dx, dx
     xor si, si
     xor di, di
 
     mov bx, [bp+4]
-    mov es, [bp+6]
+    mov di, [bp+6]
     mov cx, [bp+8]
 
 interpreter_loop:
@@ -162,27 +163,37 @@ interpreter_loop:
     je command_inc
     cmp al, '-'
     je command_dec
+    cmp al, '.'
+    je command_print
     jmp end_iteration
 
 command_inc:
-    mov ah, [byte ptr es:di]
+    mov ah, [byte ptr di]
     inc ah
-    mov [byte ptr es:di], ah
+    mov [byte ptr di], ah
 jmp end_iteration
 
 command_dec:
-    mov ah, [byte ptr es:di]
+    mov ah, [byte ptr di]
     dec ah
-    mov [byte ptr es:di], ah
+    mov [byte ptr di], ah
+jmp end_iteration
+
+command_print:
+    xor dx, dx
+    xor ax, ax
+    mov dl, [byte ptr di]
+    mov ah, 2h
+    int 21h
 jmp end_iteration
 
 end_iteration:
     inc si
 loop interpreter_loop
 
-    pop es
     pop di
     pop si
+    pop dx
     pop cx
     pop bx
     pop ax
@@ -205,6 +216,9 @@ main:
     push offset commands
     push offset file_handle
     call read_file
+        
+    push offset file_handle
+    call close_file
 
     ; set endline character at 
     ; the end of the commands buffer 
@@ -213,6 +227,7 @@ main:
     mov al, '$'
     mov [byte ptr si+bx], al
 
+    xor al, al
     mov dx, offset commands
     mov ah, 9h
     int 21h
@@ -221,9 +236,6 @@ main:
     push offset memory
     push offset commands
     call interpret
-
-    push offset file_handle
-    call close_file
 
     jmp exit
 
