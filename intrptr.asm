@@ -3,10 +3,10 @@ MODEL SMALL
 STACK 100h
 
 DATASEG
-    MEMORY_SIZE equ 100
+    MEMORY_SIZE equ 1000
     INITIAL_MEMORY_VALUE equ 0
 
-    COMMANDS_SIZE equ 100
+    COMMANDS_SIZE equ 1000
     INITIAL_COMMAND_SIZE equ 0
 
     file_name db 'code.txt', 0
@@ -165,6 +165,10 @@ interpreter_loop:
     je command_dec
     cmp al, '.'
     je command_print
+    cmp al, '>'
+    je command_inc_memp
+    cmp al, '<'
+    je command_dec_memp
     jmp end_iteration
 
 command_inc:
@@ -186,6 +190,14 @@ command_print:
     mov ah, 2h
     int 21h
 jmp end_iteration
+
+command_inc_memp:
+    inc di
+jmp end_iteration    
+
+command_dec_memp:
+    dec di
+jmp end_iteration    
 
 end_iteration:
     inc si
@@ -227,10 +239,10 @@ main:
     mov al, '$'
     mov [byte ptr si+bx], al
 
-    xor al, al
-    mov dx, offset commands
-    mov ah, 9h
-    int 21h
+    ; xor al, al
+    ; mov dx, offset commands
+    ; mov ah, 9h
+    ; int 21h
 
     push [commands_length]
     push offset memory
