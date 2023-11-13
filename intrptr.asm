@@ -127,6 +127,50 @@ proc read_file
 endp read_file
 ;----------------------------------------------------------------
 
+;----------------------------------------------------------------
+proc interpret
+    ; [bp+4] offset commands
+    ; [bp+6] offset memory
+    ; [bp+8] commands_length [value]
+
+    ; si will be command pointer
+    ; di will be memory pointer
+
+    push bp
+    mov bp, sp
+    push ax
+    push bx
+    push cx
+    push si
+    push di
+    push es
+
+    xor ax, ax
+    xor bx, bx
+    xor cx, cx
+    xor si, si
+    xor di, di
+
+    mov bx, [bp+4]
+    mov es, [bp+6]
+    mov cx, [bp+8]
+
+interpreter_loop:
+
+    inc si
+loop interpreter_loop
+
+    pop es
+    pop di
+    pop si
+    pop cx
+    pop bx
+    pop ax
+    pop bp
+    ret 6
+endp interpret
+;----------------------------------------------------------------
+
 main:
     mov ax, @data
     mov ds, ax
@@ -152,6 +196,11 @@ main:
     mov dx, offset commands
     mov ah, 9h
     int 21h
+
+    push [commands_length]
+    push offset memory
+    push offset commands
+    call interpret
 
     push offset file_handle
     call close_file
