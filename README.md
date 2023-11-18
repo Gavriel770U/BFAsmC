@@ -1,2 +1,2 @@
-# BFAsmC
-Brainf*ck Compiler in x8086 Assembly
+# BFAsmI
+Brainf*ck Interpreter in x8086 Assembly
